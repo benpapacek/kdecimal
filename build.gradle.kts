@@ -5,8 +5,8 @@ plugins {
     application
 }
 
-group = "me.bpapacek"
-version = "1.0-SNAPSHOT"
+group = "com.papacekb"
+version = "1.0"
 
 repositories {
     mavenCentral()
