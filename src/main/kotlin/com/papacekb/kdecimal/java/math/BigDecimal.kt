@@ -3981,8 +3981,8 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         private val MAX_COMPACT_DIGITS = 18
 
         /* Appease the serialization gods */
-        @java.io.Serial
-        private val serialVersionUID = 6108874887143696463L
+//        @java.io.Serial
+//        private val serialVersionUID = 6108874887143696463L
 
         // Cache of common small BigDecimal values.
         private val ZERO_THROUGH_TEN = arrayOf(

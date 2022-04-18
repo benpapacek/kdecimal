@@ -5205,8 +5205,8 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         )
 
         /** use serialVersionUID from JDK 1.1. for interoperability  */
-        @java.io.Serial
-        private val serialVersionUID = -8287574255936472291L
+//        @java.io.Serial
+//        private val serialVersionUID = -8287574255936472291L
 
         /**
          * Serializable fields for BigInteger.

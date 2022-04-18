@@ -16,6 +16,13 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
+tasks {
+    val sourcesJar by creating(Jar::class) {
+        archiveClassifier.set("sources")
+        from(sourceSets.main.get().allSource)
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
 }
