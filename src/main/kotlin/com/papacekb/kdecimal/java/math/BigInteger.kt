@@ -436,7 +436,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             firstGroupLen = digitsPerInt[radix]
         var group = `val`.substring(cursor, cursor + firstGroupLen)
         cursor += firstGroupLen
-        magnitude[numWords - 1] = Integer.parseInt(group, radix)
+        magnitude[numWords - 1] = group.toInt(radix)
         if (magnitude[numWords - 1] < 0)
             throw NumberFormatException("Illegal digit")
 
@@ -446,7 +446,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         while (cursor < len) {
             group = `val`.substring(cursor, cursor + digitsPerInt[radix])
             cursor += digitsPerInt[radix]
-            groupVal = Integer.parseInt(group, radix)
+            groupVal = group.toInt(radix)
             if (groupVal < 0)
                 throw NumberFormatException("Illegal digit")
             destructiveMulAdd(magnitude, superRadix, groupVal)
