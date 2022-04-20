@@ -2477,7 +2477,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
                 val magBitLength = (len - 1 shl 5) + bitLengthForInt(mag[0])
                 if (signum < 0) {
                     // Check if magnitude is a power of two
-                    var pow2 = Integer.bitCount(mag[0]) == 1
+                    var pow2 = mag[0].countOneBits() == 1
                     var i = 1
                     while (i < len && pow2) {
                         pow2 = mag[i] == 0
@@ -2508,7 +2508,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             bc = 0      // offset by one to initialize
             // Count the bits in the magnitude
             for (i in mag.indices)
-                bc += Integer.bitCount(mag[i])
+                bc += mag[i].countOneBits()
             if (signum < 0) {
                 // Count the trailing zeros in the magnitude
                 var magTrailingZeroCount = 0
@@ -4094,7 +4094,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         }
 
         private fun multiplyByInt(x: IntArray, y: Int, sign: Int): BigInteger {
-            if (Integer.bitCount(y) == 1) {
+            if (y.countOneBits() == 1) {
                 return BigInteger(shiftLeft(x, y.countTrailingZeroBits()), sign)
             }
             val xlen = x.size
