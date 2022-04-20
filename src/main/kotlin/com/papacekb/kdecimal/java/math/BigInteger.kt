@@ -37,7 +37,7 @@ import com.papacekb.kdecimal.jdk.internal.math.FloatConsts
  * Immutable arbitrary-precision integers.  All operations behave as if
  * BigIntegers were represented in two's-complement notation (like Java's
  * primitive integer types).  BigInteger provides analogues to all of Java's
- * primitive integer operators, and all relevant methods from java.lang.Math.
+ * primitive integer operators, and all relevant methods from java.lang.kotlin.math.
  * Additionally, BigInteger provides operations for modular arithmetic, GCD
  * calculation, primality testing, prime generation, bit manipulation,
  * and a few other miscellaneous operations.
@@ -687,7 +687,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
      */
 //    fun primeToCertainty(certainty: Int, random: Random?): Boolean {
 //        var rounds = 0
-//        val n = (Math.min(certainty, Integer.MAX_VALUE - 1) + 1) / 2
+//        val n = (kotlin.math.min(certainty, Integer.MAX_VALUE - 1) + 1) / 2
 //
 //        // The relationship between the certainty and the number of rounds
 //        // we perform is given in the draft standard ANSI X9.80, "PRIME
@@ -728,7 +728,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         var d = 5
         while (jacobiSymbol(d, this) != -1) {
             // 5, -7, 9, -11, ...
-            d = if (d < 0) Math.abs(d) + 2 else -(d + 2)
+            d = if (d < 0) kotlin.math.abs(d) + 2 else -(d + 2)
         }
 
         // Step 2
@@ -876,11 +876,11 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         if (signum == 0)
             return valueOf(`val`)
         if (java.lang.Long.signum(`val`) == signum)
-            return BigInteger(add(mag, Math.abs(`val`)), signum)
+            return BigInteger(add(mag, kotlin.math.abs(`val`)), signum)
         val cmp = compareMagnitude(`val`)
         if (cmp == 0)
             return ZERO
-        var resultMag = if (cmp > 0) subtract(mag, Math.abs(`val`)) else subtract(Math.abs(`val`), mag)
+        var resultMag = if (cmp > 0) subtract(mag, kotlin.math.abs(`val`)) else subtract(kotlin.math.abs(`val`), mag)
         resultMag = trustedStripLeadingZeroInts(resultMag)
         return BigInteger(resultMag, if (cmp == signum) 1 else -1)
     }
@@ -2293,7 +2293,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
      * @return `this & val`
      */
     fun and(`val`: BigInteger): BigInteger {
-        val result = IntArray(Math.max(intLength(), `val`.intLength()))
+        val result = IntArray(kotlin.math.max(intLength(), `val`.intLength()))
         for (i in result.indices)
             result[i] = getInt(result.size - i - 1) and `val`.getInt(result.size - i - 1)
 
@@ -2309,7 +2309,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
      * @return `this | val`
      */
     fun or(`val`: BigInteger): BigInteger {
-        val result = IntArray(Math.max(intLength(), `val`.intLength()))
+        val result = IntArray(kotlin.math.max(intLength(), `val`.intLength()))
         for (i in result.indices)
             result[i] = getInt(result.size - i - 1) or `val`.getInt(result.size - i - 1)
 
@@ -2325,7 +2325,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
      * @return `this ^ val`
      */
     fun xor(`val`: BigInteger): BigInteger {
-        val result = IntArray(Math.max(intLength(), `val`.intLength()))
+        val result = IntArray(kotlin.math.max(intLength(), `val`.intLength()))
         for (i in result.indices)
             result[i] = getInt(result.size - i - 1) xor `val`.getInt(result.size - i - 1)
 
@@ -2358,7 +2358,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
      * @return `this & ~val`
      */
     fun andNot(`val`: BigInteger): BigInteger {
-        val result = IntArray(Math.max(intLength(), `val`.intLength()))
+        val result = IntArray(kotlin.math.max(intLength(), `val`.intLength()))
         for (i in result.indices)
             result[i] = getInt(result.size - i - 1) and `val`.getInt(result.size - i - 1).inv()
 
@@ -2396,7 +2396,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             throw ArithmeticException("Negative bit address")
 
         val intNum = n.ushr(5)
-        val result = IntArray(Math.max(intLength(), intNum + 2))
+        val result = IntArray(kotlin.math.max(intLength(), intNum + 2))
 
         for (i in result.indices)
             result[result.size - i - 1] = getInt(i)
@@ -2420,7 +2420,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             throw ArithmeticException("Negative bit address")
 
         val intNum = n.ushr(5)
-        val result = IntArray(Math.max(intLength(), (n + 1).ushr(5) + 1))
+        val result = IntArray(kotlin.math.max(intLength(), (n + 1).ushr(5) + 1))
 
         for (i in result.indices)
             result[result.size - i - 1] = getInt(i)
@@ -2444,7 +2444,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             throw ArithmeticException("Negative bit address")
 
         val intNum = n.ushr(5)
-        val result = IntArray(Math.max(intLength(), intNum + 2))
+        val result = IntArray(kotlin.math.max(intLength(), intNum + 2))
 
         for (i in result.indices)
             result[result.size - i - 1] = getInt(i)
@@ -2747,7 +2747,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         //     floor(bitLength*log(2)/log(radix)) + 1
         // plus an additional character for the sign if negative.
         val b = abs.bitLength()
-        val numChars = (Math.floor(b * LOG_TWO / logCache[radix]) + 1).toInt() + if (signum < 0) 1 else 0
+        val numChars = (kotlin.math.floor(b * LOG_TWO / logCache[radix]) + 1).toInt() + if (signum < 0) 1 else 0
         val sb = StringBuilder(numChars)
 
         if (signum < 0) {
@@ -3826,7 +3826,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         private val logCache: DoubleArray
 
         /** The natural log of 2.  This is used in computing cache indices.  */
-        private val LOG_TWO = Math.log(2.0)
+        private val LOG_TWO = kotlin.math.ln(2.0)
 
         init {
             assert(
@@ -3855,7 +3855,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
 
             for (i in Character.MIN_RADIX..Character.MAX_RADIX) {
                 powerCache[i] = arrayOf(BigInteger.valueOf(i.toLong()))
-                logCache[i] = Math.log(i.toDouble())
+                logCache[i] = kotlin.math.ln(i.toDouble())
             }
         }
 
@@ -4199,7 +4199,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             val ylen = y.mag.size
 
             // The number of ints in each half of the number.
-            val half = (Math.max(xlen, ylen) + 1) / 2
+            val half = (kotlin.math.max(xlen, ylen) + 1) / 2
 
             // xl and yl are the lower halves of x and y respectively,
             // xh and yh are the upper halves.
@@ -4257,7 +4257,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
 //            val alen = a.mag.size
 //            val blen = b.mag.size
 //
-//            val largest = Math.max(alen, blen)
+//            val largest = kotlin.math.max(alen, blen)
 //
 //            // k is the size (in ints) of the lower-order slices.
 //            val k = (largest + 2) / 3   // Equal to ceil(largest/3)
@@ -4827,7 +4827,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             // and subtract 1 from that value.  This is used to find the
             // cache index that contains the best value to divide u.
             val b = u.bitLength()
-            val n = Math.round(Math.log(b * LOG_TWO / logCache[radix]) / LOG_TWO - 1.0).toInt()
+            val n = kotlin.math.round(kotlin.math.ln(b * LOG_TWO / logCache[radix]) / LOG_TWO - 1.0).toInt()
 
             val v = getRadixConversionCache(radix, n)
             val results: Array<BigInteger>
@@ -4926,7 +4926,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             for (i in intLength - 1 downTo 0) {
                 result[i] = a[b--].toInt() and 0xff
                 val bytesRemaining = b - keep + 1
-                val bytesToTransfer = Math.min(3, bytesRemaining)
+                val bytesToTransfer = kotlin.math.min(3, bytesRemaining)
                 var j = 8
                 while (j <= bytesToTransfer shl 3) {
                     result[i] = result[i] or (a[b--].toInt() and 0xff shl j)
@@ -4968,7 +4968,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             var b = indexBound - 1
             for (i in intLength - 1 downTo 0) {
                 result[i] = a[b--].toInt() and 0xff
-                var numBytesToTransfer = Math.min(3, b - keep + 1)
+                var numBytesToTransfer = kotlin.math.min(3, b - keep + 1)
                 if (numBytesToTransfer < 0)
                     numBytesToTransfer = 0
                 var j = 8

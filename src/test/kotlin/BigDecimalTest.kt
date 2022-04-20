@@ -26,7 +26,9 @@ class BigDecimalTest {
 
     @Test
     fun foo() {
-        println('d'.digitToIntOrNull() ?: -1)
+//        println('d'.digitToIntOrNull() ?: -1)
+        println(java.lang.Math.log(421.0))
+        println(kotlin.math.ln(421.0))
     }
 
     @Test
