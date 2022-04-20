@@ -30,6 +30,7 @@
 package com.papacekb.kdecimal.java.math
 
 import com.papacekb.kdecimal.java.util.Objects
+import com.papacekb.kdecimal.java.util.digit
 import com.papacekb.kdecimal.jdk.internal.math.DoubleConsts
 import com.papacekb.kdecimal.jdk.internal.math.FloatConsts
 
@@ -410,7 +411,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             throw NumberFormatException("Zero length BigInteger")
 
         // Skip leading zeros and compute number of digits in magnitude
-        while (cursor < len && Character.digit(`val`[cursor], radix) == 0) {
+        while (cursor < len && `val`[cursor].digit(radix) == 0) {
             cursor++
         }
 
@@ -471,7 +472,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         val numDigits: Int
 
         // Skip leading zeros and compute number of digits in magnitude
-        while (cursor < len && Character.digit(`val`[cursor], 10) == 0) {
+        while (cursor < len && `val`[cursor].digit(10) == 0) {
             cursor++
         }
         if (cursor == len) {
@@ -519,12 +520,12 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
     // is to be treated as an unsigned value.
     private fun parseInt(source: CharArray, start: Int, end: Int): Int {
         var start = start
-        var result = Character.digit(source[start++], 10)
+        var result = source[start++].digit(10)
         if (result == -1)
             throw NumberFormatException(String(source))
 
         for (index in start until end) {
-            val nextVal = Character.digit(source[index], 10)
+            val nextVal = source[index].digit(10)
             if (nextVal == -1)
                 throw NumberFormatException(String(source))
             result = 10 * result + nextVal

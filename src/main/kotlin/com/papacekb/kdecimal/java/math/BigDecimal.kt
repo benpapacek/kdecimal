@@ -30,6 +30,7 @@
 package com.papacekb.kdecimal.java.math
 
 import com.papacekb.kdecimal.java.util.Objects
+import com.papacekb.kdecimal.java.util.digit
 
 /**
  * Immutable, arbitrary-precision signed decimal numbers.  A `BigDecimal` consists of an arbitrary precision integer
@@ -453,7 +454,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                             throw NumberFormatException("Character array" + " contains more than one decimal point.")
                         dot = true
                     } else if (Character.isDigit(c)) { // slow path
-                        val digit = Character.digit(c, 10)
+                        val digit = c.digit(10)
                         if (digit == 0) {
                             if (prec == 0)
                                 prec = 1
@@ -512,7 +513,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                     if (c >= '0' && c <= '9' || Character.isDigit(c)) {
                         // First compact case, we need not to preserve the character
                         // and we can just compute the value in place.
-                        if (c == '0' || Character.digit(c, 10) == 0) {
+                        if (c == '0' || c.digit(10) == 0) {
                             if (prec == 0) {
                                 coeff[idx] = c
                                 prec = 1
@@ -4076,7 +4077,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             // no exponent digits
                 throw NumberFormatException("No exponent digits.")
             // skip leading zeros in the exponent
-            while (len > 10 && (c == '0' || Character.digit(c, 10) == 0)) {
+            while (len > 10 && (c == '0' || c.digit(10) == 0)) {
                 offset++
                 c = `in`[offset]
                 len--
@@ -4090,7 +4091,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                 if (c >= '0' && c <= '9') {
                     v = c - '0'
                 } else {
-                    v = Character.digit(c, 10)
+                    v = c.digit(10)
                     if (v < 0)
                     // not a digit
                         throw NumberFormatException("Not a digit.")
