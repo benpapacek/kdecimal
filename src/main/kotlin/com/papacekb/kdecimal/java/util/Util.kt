@@ -10,6 +10,24 @@ fun assertK(condition: Boolean, message: (() -> String)? = null) {
     }
 }
 
+//fun <T> arraycopyk(src: Array<T>, srcPos: Int, dest: Array<T>, destPos: Int, length: Int) {
+//    src.copyInto(
+//        destination = dest,
+//        startIndex = srcPos,
+//        destinationOffset = destPos,
+//        endIndex = srcPos + length
+//    )
+//}
+
+fun arraycopyk(src: IntArray, srcPos: Int, dest: IntArray, destPos: Int, length: Int) {
+    src.copyInto(
+        destination = dest,
+        startIndex = srcPos,
+        destinationOffset = destPos,
+        endIndex = srcPos + length
+    )
+}
+
 const val FLOAT_MAX_EXPONENT = 127
 const val FLOAT_MIN_EXPONENT = -126
 const val DOUBLE_MAX_EXPONENT = 1023

@@ -25,6 +25,7 @@
 
 package com.papacekb.kdecimal.java.math
 
+import com.papacekb.kdecimal.java.util.arraycopyk
 import com.papacekb.kdecimal.java.util.assertK
 
 /**
@@ -485,7 +486,7 @@ open class MutableBigInteger {
         val len = src.intLen
         if (value.size < len)
             value = IntArray(len)
-        System.arraycopy(src.value, src.offset, value, 0, len)
+        arraycopyk(src.value, src.offset, value, 0, len)
         intLen = len
         offset = 0
     }
@@ -498,7 +499,7 @@ open class MutableBigInteger {
         val len = `val`.size
         if (value.size < len)
             value = IntArray(len)
-        System.arraycopy(`val`, 0, value, 0, len)
+        arraycopyk(`val`, 0, value, 0, len)
         intLen = len
         offset = 0
     }
@@ -783,7 +784,7 @@ open class MutableBigInteger {
                 val temp = IntArray(resultLen)
                 // Result one word longer from carry-out; copy low-order
                 // bits into new result.
-                System.arraycopy(result, 0, temp, 1, result.size)
+                arraycopyk(result, 0, temp, 1, result.size)
                 temp[0] = 1
                 result = temp
             } else {
@@ -850,7 +851,7 @@ open class MutableBigInteger {
                 val temp = IntArray(resultLen)
                 // Result one word longer from carry-out; copy low-order
                 // bits into new result.
-                System.arraycopy(result, 0, temp, 1, result.size)
+                arraycopyk(result, 0, temp, 1, result.size)
                 temp[0] = 1
                 result = temp
             } else {
@@ -886,12 +887,12 @@ open class MutableBigInteger {
         var rstart = result.size - 1
 
         // copy from this if needed
-        System.arraycopy(value, offset, result, rstart + 1 - x, x)
+        arraycopyk(value, offset, result, rstart + 1 - x, x)
         y -= x
         rstart -= x
 
         val len = Math.min(y, addend.value.size - addend.offset)
-        System.arraycopy(addend.value, addend.offset, result, rstart + 1 - y, len)
+        arraycopyk(addend.value, addend.offset, result, rstart + 1 - y, len)
 
         // zero the gap
         for (i in rstart + 1 - y + len until rstart + 1)
@@ -1519,7 +1520,7 @@ open class MutableBigInteger {
         } else {
             divisor = div.value.copyOfRange(div.offset, div.offset + div.intLen)
             rem = MutableBigInteger(IntArray(intLen + 1))
-            System.arraycopy(value, offset, rem.value, 1, intLen)
+            arraycopyk(value, offset, rem.value, 1, intLen)
             rem.intLen = intLen
             rem.offset = 1
         }
@@ -1691,7 +1692,7 @@ open class MutableBigInteger {
         var ldivisor = ldivisor
         // Remainder starts as dividend with space for a leading zero
         val rem = MutableBigInteger(IntArray(intLen + 1))
-        System.arraycopy(value, offset, rem.value, 1, intLen)
+        arraycopyk(value, offset, rem.value, 1, intLen)
         rem.intLen = intLen
         rem.offset = 1
 

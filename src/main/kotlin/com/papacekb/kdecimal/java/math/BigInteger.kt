@@ -1175,7 +1175,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         }
 
         val intSlice = IntArray(sliceSize)
-        System.arraycopy(mag, start, intSlice, 0, sliceSize)
+        arraycopyk(mag, start, intSlice, 0, sliceSize)
 
         return BigInteger(trustedStripLeadingZeroInts(intSlice), 1)
     }
@@ -1235,7 +1235,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         }
 
         val lowerInts = IntArray(n)
-        System.arraycopy(mag, len - n, lowerInts, 0, n)
+        arraycopyk(mag, len - n, lowerInts, 0, n)
 
         return BigInteger(trustedStripLeadingZeroInts(lowerInts), 1)
     }
@@ -1254,7 +1254,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
 
         val upperLen = len - n
         val upperInts = IntArray(upperLen)
-        System.arraycopy(mag, 0, upperInts, 0, upperLen)
+        arraycopyk(mag, 0, upperInts, 0, upperLen)
 
         return BigInteger(trustedStripLeadingZeroInts(upperInts), 1)
     }
@@ -1920,7 +1920,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         // the correct functioning of the HotSpot intrinsics.
         if (modLen and 1 != 0) {
             val x = IntArray(modLen + 1)
-            System.arraycopy(mod, 0, x, 1, modLen)
+            arraycopyk(mod, 0, x, 1, modLen)
             mod = x
             modLen++
         }
@@ -1964,7 +1964,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         if (table[0]!!.size < modLen) {
             val offset = modLen - table[0]!!.size
             val t2 = IntArray(modLen)
-            System.arraycopy(table[0], 0, t2, offset, table[0]!!.size)
+            arraycopyk(table[0]!!, 0, t2, offset, table[0]!!.size)
             table[0] = t2
         }
 
@@ -2070,7 +2070,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
 
         // Convert result out of Montgomery form and return
         var t2 = IntArray(2 * modLen)
-        System.arraycopy(b, 0, t2, modLen, modLen)
+        arraycopyk(b, 0, t2, modLen, modLen)
 
         b = montReduce(t2, mod, modLen, inv.toInt())
 
@@ -2118,7 +2118,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         // Copy remaining ints of mag
         val numInts = (p + 31).ushr(5)
         val mag = IntArray(numInts)
-        System.arraycopy(this.mag, this.mag.size - numInts, mag, 0, numInts)
+        arraycopyk(this.mag, this.mag.size - numInts, mag, 0, numInts)
 
         // Mask out any excess bits
         val excessBits = (numInts shl 5) - p
@@ -3934,7 +3934,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             // Grow result if necessary
             if (carry) {
                 val bigger = IntArray(result.size + 1)
-                System.arraycopy(result, 0, bigger, 1, result.size)
+                arraycopyk(result, 0, bigger, 1, result.size)
                 bigger[0] = 0x01
                 return bigger
             }
@@ -3986,7 +3986,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             // Grow result if necessary
             if (carry) {
                 val bigger = IntArray(result.size + 1)
-                System.arraycopy(result, 0, bigger, 1, result.size)
+                arraycopyk(result, 0, bigger, 1, result.size)
                 bigger[0] = 0x01
                 return bigger
             }
@@ -4173,7 +4173,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             Objects.requireNonNull(array)
 
             if (length > array.size) {
-                throw ArrayIndexOutOfBoundsException(length - 1)
+                throw ArrayIndexOutOfBoundsException("${length - 1}")
             }
         }
 
@@ -4463,12 +4463,12 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             } else { // Array must be resized
                 if (nBits <= 32 - bitsInHighWord) {
                     val result = IntArray(nInts + len)
-                    System.arraycopy(a, 0, result, 0, len)
+                    arraycopyk(a, 0, result, 0, len)
                     primitiveLeftShift(result, result.size, nBits)
                     return result
                 } else {
                     val result = IntArray(nInts + len + 1)
-                    System.arraycopy(a, 0, result, 0, len)
+                    arraycopyk(a, 0, result, 0, len)
                     primitiveRightShift(result, result.size, 32 - nBits)
                     return result
                 }
@@ -4719,7 +4719,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
 
             if (nBits == 0) {
                 newMag = IntArray(magLen + nInts)
-                System.arraycopy(mag, 0, newMag, 0, magLen)
+                arraycopyk(mag, 0, newMag, 0, magLen)
             } else {
                 var i = 0
                 val nBits2 = 32 - nBits
