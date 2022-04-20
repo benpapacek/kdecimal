@@ -128,7 +128,7 @@ import kotlin.math.sign
  * @since 1.1
  */
 
-class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger> {
+class BigInteger : com.papacekb.kdecimal.java.lang.KNumber, Comparable<BigInteger> {
     /**
      * The signum of this BigInteger: -1 for negative, 0 for zero, or
      * 1 for positive.  Note that the BigInteger zero *must* have

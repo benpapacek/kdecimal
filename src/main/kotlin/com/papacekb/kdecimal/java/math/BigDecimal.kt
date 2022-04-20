@@ -303,7 +303,7 @@ import kotlin.math.sign
  * @author  Sergey V. Kuksenko
  * @since 1.1
  */
-class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal> {
+class BigDecimal : com.papacekb.kdecimal.java.lang.KNumber, Comparable<BigDecimal> {
     /**
      * The unscaled value of this BigDecimal, as returned by [ ][.unscaledValue].
      *

@@ -54,7 +54,7 @@ package com.papacekb.kdecimal.java.lang
 /**
  * Constructor for subclasses to call.
  */
-abstract class Number {
+abstract class KNumber {
 
     /**
      * Returns the value of the specified number as an `int`.
