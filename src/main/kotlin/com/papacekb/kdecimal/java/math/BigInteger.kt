@@ -4444,7 +4444,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
          * Package private method to return bit length for an integer.
          */
         fun bitLengthForInt(n: Int): Int {
-            return 32 - Integer.numberOfLeadingZeros(n)
+            return 32 - n.countLeadingZeroBits()
         }
 
         /**

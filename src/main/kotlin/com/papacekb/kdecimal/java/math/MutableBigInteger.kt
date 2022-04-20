@@ -1127,7 +1127,7 @@ open class MutableBigInteger {
         quotient.intLen = intLen
 
         // Normalize the divisor
-        val shift = Integer.numberOfLeadingZeros(divisor)
+        val shift = divisor.countLeadingZeroBits()
 
         var rem = value[offset]
         var remLong = rem.toLong() and BigInteger.LONG_MASK
@@ -1267,7 +1267,7 @@ open class MutableBigInteger {
             // additional benefit.
 
             // step 1: let m = min{2^k | (2^k)*Companion.getBURNIKEL_ZIEGLER_THRESHOLD$KDecimal() > s}
-            val m = 1 shl 32 - Integer.numberOfLeadingZeros(s / BigInteger.BURNIKEL_ZIEGLER_THRESHOLD)
+            val m = 1 shl 32 - (s / BigInteger.BURNIKEL_ZIEGLER_THRESHOLD).countLeadingZeroBits()
 
             val j = (s + m - 1) / m      // step 2a: j = ceil(s/m)
             val n = j * m            // step 2b: block length in 32-bit units
@@ -1438,7 +1438,7 @@ open class MutableBigInteger {
     /** @see BigInteger.bitLength
      */
     fun bitLength(): Long {
-        return if (intLen == 0) 0 else intLen * 32L - Integer.numberOfLeadingZeros(value[offset])
+        return if (intLen == 0) 0 else intLen * 32L - value[offset].countLeadingZeroBits()
     }
 
     /**
@@ -1484,7 +1484,7 @@ open class MutableBigInteger {
     ): MutableBigInteger? {
         // assert div.intLen > 1
         // D1 normalize the divisor
-        val shift = Integer.numberOfLeadingZeros(div.value[div.offset])
+        val shift = div.value[div.offset].countLeadingZeroBits()
         // Copy divisor value to protect divisor
         val dlen = div.intLen
         val divisor: IntArray
@@ -1492,7 +1492,7 @@ open class MutableBigInteger {
         if (shift > 0) {
             divisor = IntArray(dlen)
             copyAndShift(div.value, div.offset, dlen, divisor, 0, shift)
-            if (Integer.numberOfLeadingZeros(value[offset]) >= shift) {
+            if (value[offset].countLeadingZeroBits() >= shift) {
                 val remarr = IntArray(intLen + 1)
                 rem = MutableBigInteger(remarr)
                 rem.intLen = intLen
