@@ -1160,7 +1160,6 @@ open class MutableBigInteger {
             rem
     }
 
-    @JvmOverloads
     fun divide(b: MutableBigInteger, quotient: MutableBigInteger, needRemainder: Boolean = true): MutableBigInteger? {
         return if (b.intLen < BigInteger.BURNIKEL_ZIEGLER_THRESHOLD || intLen - b.intLen < BigInteger.BURNIKEL_ZIEGLER_OFFSET) {
             divideKnuth(b, quotient, needRemainder)
@@ -1180,7 +1179,6 @@ open class MutableBigInteger {
      * changed.
      *
      */
-    @JvmOverloads
     fun divideKnuth(
         b: MutableBigInteger,
         quotient: MutableBigInteger,

@@ -245,7 +245,6 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
      * negative or greater than or equal to the array length.
      * @since 9
      */
-//    @JvmOverloads
 //    constructor(`val`: ByteArray, off: Int = 0, len: Int = `val`.size) {
 //        if (`val`.size == 0) {
 //            throw NumberFormatException("Zero length BigInteger")
@@ -317,7 +316,6 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
      * negative or greater than or equal to the array length.
      * @since 9
      */
-    @JvmOverloads
     constructor(signum: Int, magnitude: ByteArray, off: Int = 0, len: Int = magnitude.size) {
         if (signum < -1 || signum > 1) {
             throw NumberFormatException("Invalid signum value")
@@ -380,7 +378,6 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
      * outside the range from [Character.MIN_RADIX] to
      * [Character.MAX_RADIX], inclusive.
      */
-    @JvmOverloads
     constructor(`val`: String, radix: Int = 10) {
         var cursor = 0
         val numDigits: Int

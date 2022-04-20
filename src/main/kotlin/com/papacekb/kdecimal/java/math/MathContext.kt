@@ -112,7 +112,6 @@ class MathContext {
      * than zero.
      * @throws NullPointerException if the rounding mode argument is `null`
      */
-    @JvmOverloads
     constructor(
         setPrecision: Int,
         setRoundingMode: RoundingMode? = DEFAULT_ROUNDINGMODE

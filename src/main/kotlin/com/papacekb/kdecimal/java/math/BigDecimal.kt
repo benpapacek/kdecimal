@@ -328,13 +328,13 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
      *
      * @since  1.5
      */
-    @Transient
+    // @Transient
     private var precision: Int = 0
 
     /**
      * Used to store the canonical string representation, if computed.
      */
-    @Transient
+    // @Transient
     private var stringCache: String? = null
 
     /**
@@ -342,7 +342,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
      * less than or equal to `Long.MAX_VALUE`, the value can be
      * compactly stored in this field and used in computations.
      */
-    @Transient
+    // @Transient
     private val intCompact: Long
 
     private val isPowerOfTen: Boolean
@@ -383,7 +383,6 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
      * is not wholly within `in`.
      * @since  1.5
      */
-    @JvmOverloads
     constructor(`in`: CharArray, offset: Int = 0, len: Int = `in`.size, mc: MathContext = MathContext.UNLIMITED) {
         var offset = offset
         var len = len
@@ -777,7 +776,6 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
      * @throws NumberFormatException if `val` is infinite or NaN.
      * @since  1.5
      */
-    @JvmOverloads
     constructor(`val`: Double, mc: MathContext = MathContext.UNLIMITED) {
         if (java.lang.Double.isInfinite(`val`) || java.lang.Double.isNaN(`val`))
             throw NumberFormatException("Infinite or NaN")
