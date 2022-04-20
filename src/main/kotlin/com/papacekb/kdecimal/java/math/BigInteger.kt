@@ -98,8 +98,8 @@ import com.papacekb.kdecimal.jdk.internal.math.FloatConsts
  * a null object reference for any input parameter.
  *
  * BigInteger must support values in the range
- * -2<sup>`Integer.MAX_VALUE`</sup> (exclusive) to
- * +2<sup>`Integer.MAX_VALUE`</sup> (exclusive)
+ * -2<sup>`Int.MAX_VALUE`</sup> (exclusive) to
+ * +2<sup>`Int.MAX_VALUE`</sup> (exclusive)
  * and may support values outside of that range.
  *
  * An `ArithmeticException` is thrown when a BigInteger
@@ -114,8 +114,8 @@ import com.papacekb.kdecimal.jdk.internal.math.FloatConsts
  * In the reference implementation, BigInteger constructors and
  * operations throw `ArithmeticException` when the result is out
  * of the supported range of
- * -2<sup>`Integer.MAX_VALUE`</sup> (exclusive) to
- * +2<sup>`Integer.MAX_VALUE`</sup> (exclusive).
+ * -2<sup>`Int.MAX_VALUE`</sup> (exclusive) to
+ * +2<sup>`Int.MAX_VALUE`</sup> (exclusive).
  *
  * @see BigDecimal
  *
@@ -687,7 +687,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
      */
 //    fun primeToCertainty(certainty: Int, random: Random?): Boolean {
 //        var rounds = 0
-//        val n = (kotlin.math.min(certainty, Integer.MAX_VALUE - 1) + 1) / 2
+//        val n = (kotlin.math.min(certainty, Int.MAX_VALUE - 1) + 1) / 2
 //
 //        // The relationship between the certainty and the number of rounds
 //        // we perform is given in the draft standard ANSI X9.80, "PRIME
@@ -1530,7 +1530,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         // powers of two will be multiplied back at the end.
         val powersOfTwo = partToSquare.lowestSetBit
         val bitsToShiftLong = powersOfTwo.toLong() * exponent
-        if (bitsToShiftLong > Integer.MAX_VALUE) {
+        if (bitsToShiftLong > Int.MAX_VALUE) {
             reportOverflow()
         }
         val bitsToShift = bitsToShiftLong.toInt()
@@ -3384,7 +3384,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
          * This constant limits `mag.length` of BigIntegers to the supported
          * range.
          */
-        private val MAX_MAG_LENGTH = Integer.MAX_VALUE / Integer.SIZE + 1 // (1 << 26)
+        private val MAX_MAG_LENGTH = Int.MAX_VALUE / Integer.SIZE + 1 // (1 << 26)
 
         /**
          * Bit lengths larger than this constant can cause overflow in searchLen
@@ -3832,10 +3832,10 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             assert(
                 0 < KARATSUBA_THRESHOLD
                         && KARATSUBA_THRESHOLD < TOOM_COOK_THRESHOLD
-                        && TOOM_COOK_THRESHOLD < Integer.MAX_VALUE
+                        && TOOM_COOK_THRESHOLD < Int.MAX_VALUE
                         && 0 < KARATSUBA_SQUARE_THRESHOLD
                         && KARATSUBA_SQUARE_THRESHOLD < TOOM_COOK_SQUARE_THRESHOLD
-                        && TOOM_COOK_SQUARE_THRESHOLD < Integer.MAX_VALUE
+                        && TOOM_COOK_SQUARE_THRESHOLD < Int.MAX_VALUE
             ) { "Algorithm thresholds are inconsistent" }
 
             for (i in 1..MAX_CONSTANT) {
@@ -4583,7 +4583,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             return montReduce(product, n, len, inv.toInt())
         }
 
-        internal var bnExpModThreshTable = intArrayOf(7, 25, 81, 241, 673, 1793, Integer.MAX_VALUE) // Sentinel
+        internal var bnExpModThreshTable = intArrayOf(7, 25, 81, 241, 673, 1793, Int.MAX_VALUE) // Sentinel
 
         /**
          * Montgomery reduce n, modulo mod.  This reduces modulo mod and divides
