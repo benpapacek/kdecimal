@@ -519,12 +519,12 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         var start = start
         var result = source[start++].digit(10)
         if (result == -1)
-            throw NumberFormatException(String(source))
+            throw NumberFormatException(source.concatToString())
 
         for (index in start until end) {
             val nextVal = source[index].digit(10)
             if (nextVal == -1)
-                throw NumberFormatException(String(source))
+                throw NumberFormatException(source.concatToString())
             result = 10 * result + nextVal
         }
 
