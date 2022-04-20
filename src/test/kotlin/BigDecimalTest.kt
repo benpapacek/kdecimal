@@ -25,6 +25,11 @@ class BigDecimalTest {
     }
 
     @Test
+    fun foo() {
+        println('d'.digitToIntOrNull() ?: -1)
+    }
+
+    @Test
     fun testIntConstructor() {
         assertEquals(java.math.BigDecimal(31415).toString(), BigDecimal(31415).toString())
     }

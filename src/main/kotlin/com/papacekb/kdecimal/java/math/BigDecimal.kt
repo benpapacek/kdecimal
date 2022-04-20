@@ -1110,7 +1110,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             val augendIsZero = augend!!.signum() == 0
 
             if (lhsIsZero || augendIsZero) {
-                val preferredScale = Math.max(lhs.scale(), augend!!.scale())
+                val preferredScale = kotlin.math.max(lhs.scale(), augend!!.scale())
                 val result: BigDecimal?
 
                 if (lhsIsZero && augendIsZero)
@@ -1204,7 +1204,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         ) { // small digits not visible
             small = BigDecimal.valueOf(
                 small.signum().toLong(),
-                this.checkScale(Math.max(big.scale.toLong(), estResultUlpScale) + 3)
+                this.checkScale(kotlin.math.max(big.scale.toLong(), estResultUlpScale) + 3)
             )
         }
 
@@ -1486,8 +1486,8 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
              * mode.
              */
             val mc = MathContext(
-                Math.min(
-                    this.precision() + Math.ceil(10.0 * divisor.precision() / 3.0).toLong(),
+                kotlin.math.min(
+                    this.precision() + kotlin.math.ceil(10.0 * divisor.precision() / 3.0).toLong(),
                     Integer.MAX_VALUE.toLong()
                 ).toInt(),
                 RoundingMode.UNNECESSARY
@@ -1596,10 +1596,10 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         // Perform a divide with enough digits to round to a correct
         // integer value; then remove any fractional digits
 
-        val maxDigits = Math.min(
+        val maxDigits = kotlin.math.min(
             this.precision().toLong() +
-                    Math.ceil(10.0 * divisor.precision() / 3.0).toLong() +
-                    Math.abs(this.scale().toLong() - divisor.scale()) + 2,
+                    kotlin.math.ceil(10.0 * divisor.precision() / 3.0).toLong() +
+                    kotlin.math.abs(this.scale().toLong() - divisor.scale()) + 2,
             Integer.MAX_VALUE.toLong()
         ).toInt()
         var quotient = this.divide(
@@ -1685,7 +1685,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         val precisionDiff: Int
         precisionDiff = mc.precision - result.precision()
         return if (preferredScale > result.scale() && precisionDiff > 0) {
-            result.setScale(result.scale() + Math.min(precisionDiff, preferredScale - result.scale))
+            result.setScale(result.scale() + kotlin.math.min(precisionDiff, preferredScale - result.scale))
         } else {
             stripZerosToMatchScale(result.intVal, result.intCompact, result.scale, preferredScale)
         }
@@ -1947,7 +1947,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             // low-enough precision, the post-Newton rounding logic
             // could be applied directly.)
 
-            val guess = BigDecimal(Math.sqrt(working.doubleValue()))
+            val guess = BigDecimal(kotlin.math.sqrt(working.doubleValue()))
             var guessPrecision = 15
             val originalPrecision = mc.precision
             var targetPrecision: Int
@@ -1984,8 +1984,8 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             var approx = guess
             val workingPrecision = working.precision()
             do {
-                val tmpPrecision = Math.max(
-                    Math.max(guessPrecision, targetPrecision + 2),
+                val tmpPrecision = kotlin.math.max(
+                    kotlin.math.max(guessPrecision, targetPrecision + 2),
                     workingPrecision
                 )
                 val mcTmp = MathContext(tmpPrecision, RoundingMode.HALF_EVEN)
@@ -2251,7 +2251,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             return ONE                      // x**0 == 1 in X3.274
         val lhs = this
         var workmc = mc           // working settings
-        var mag = Math.abs(n)               // magnitude of n
+        var mag = kotlin.math.abs(n)               // magnitude of n
         if (mc.precision > 0) {
             val elength = longDigitLength(mag.toLong()) // length of n in digits
             if (elength > mc.precision)
@@ -3124,7 +3124,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         }
         val str: String
         if (intCompact != INFLATED) {
-            str = java.lang.Long.toString(Math.abs(intCompact))
+            str = java.lang.Long.toString(kotlin.math.abs(intCompact))
         } else {
             str = intVal!!.abs().toString()
         }
@@ -3403,9 +3403,9 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                  * multiply or divide to compute the (properly
                  * rounded) result.
                  */
-                if (Math.abs(intCompact) < 1L shl 22) {
+                if (kotlin.math.abs(intCompact) < 1L shl 22) {
                     // Don't have too guard against
-                    // Math.abs(MIN_VALUE) because of outer check
+                    // kotlin.math.abs(MIN_VALUE) because of outer check
                     // against INFLATED.
                     if (scale > 0 && scale < FLOAT_10_POW.size) {
                         return intCompact.toFloat() / FLOAT_10_POW[scale]
@@ -3446,9 +3446,9 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                  * double multiply or divide to compute the (properly
                  * rounded) result.
                  */
-                if (Math.abs(intCompact) < 1L shl 52) {
+                if (kotlin.math.abs(intCompact) < 1L shl 52) {
                     // Don't have too guard against
-                    // Math.abs(MIN_VALUE) because of outer check
+                    // kotlin.math.abs(MIN_VALUE) because of outer check
                     // against INFLATED.
                     if (scale > 0 && scale < DOUBLE_10_POW.size) {
                         return intCompact.toDouble() / DOUBLE_10_POW[scale]
@@ -3790,7 +3790,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         val offset: Int  // offset is the starting index for coeff array
         // Get the significand as an absolute value
         if (intCompact != INFLATED) {
-            offset = sbHelper.putIntCompact(Math.abs(intCompact))
+            offset = sbHelper.putIntCompact(kotlin.math.abs(intCompact))
             coeff = sbHelper.compactCharArray
         } else {
             offset = 0
@@ -4471,7 +4471,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                 val tenpower = tab[n]
                 if (`val` == 1L)
                     return tenpower
-                if (Math.abs(`val`) <= bounds[n])
+                if (kotlin.math.abs(`val`) <= bounds[n])
                     return `val` * tenpower
             }
             return INFLATED
@@ -5134,7 +5134,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         private fun createAndStripZerosToMatchScale(compactVal: Long, scale: Int, preferredScale: Long): BigDecimal {
             var compactVal = compactVal
             var scale = scale
-            while (Math.abs(compactVal) >= 10L && scale > preferredScale) {
+            while (kotlin.math.abs(compactVal) >= 10L && scale > preferredScale) {
                 if (compactVal and 1L != 0L)
                     break // odd number cannot end in 0
                 val r = compactVal % 10L
@@ -5596,9 +5596,9 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             var divisor = divisor
             val qsign =
                 java.lang.Long.signum(dividend0) * java.lang.Long.signum(dividend1) * java.lang.Long.signum(divisor)
-            dividend0 = Math.abs(dividend0)
-            dividend1 = Math.abs(dividend1)
-            divisor = Math.abs(divisor)
+            dividend0 = kotlin.math.abs(dividend0)
+            dividend1 = kotlin.math.abs(dividend1)
+            divisor = kotlin.math.abs(divisor)
             // multiply dividend0 * dividend1
             val d0_hi = dividend0.ushr(32)
             val d0_lo = dividend0 and BigInteger.LONG_MASK
@@ -5860,8 +5860,8 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
 
         private fun multiply(x: Long, y: Long): Long {
             val product = x * y
-            val ax = Math.abs(x)
-            val ay = Math.abs(y)
+            val ax = kotlin.math.abs(x)
+            val ay = kotlin.math.abs(y)
             return if ((ax or ay).ushr(31) == 0L || y == 0L || product / y == x) {
                 product
             } else INFLATED
