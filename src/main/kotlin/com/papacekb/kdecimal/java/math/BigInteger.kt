@@ -1595,7 +1595,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
                 valueOf(result * newSign)!!
             }
         } else {
-            if (bitLength().toLong() * exponent / Integer.SIZE > MAX_MAG_LENGTH) {
+            if (bitLength().toLong() * exponent / Int.SIZE_BITS > MAX_MAG_LENGTH) {
                 reportOverflow()
             }
 
@@ -3382,7 +3382,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
          * This constant limits `mag.length` of BigIntegers to the supported
          * range.
          */
-        private val MAX_MAG_LENGTH = Int.MAX_VALUE / Integer.SIZE + 1 // (1 << 26)
+        private val MAX_MAG_LENGTH = Int.MAX_VALUE / Int.SIZE_BITS + 1 // (1 << 26)
 
         /**
          * Bit lengths larger than this constant can cause overflow in searchLen
