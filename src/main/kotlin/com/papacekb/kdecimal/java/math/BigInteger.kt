@@ -4173,7 +4173,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             Objects.requireNonNull(array)
 
             if (length > array.size) {
-                throw ArrayIndexOutOfBoundsException("${length - 1}")
+                throw IllegalStateException("Array index out of bounds: ${length - 1}")
             }
         }
 

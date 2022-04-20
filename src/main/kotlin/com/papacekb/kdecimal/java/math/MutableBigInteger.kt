@@ -891,7 +891,7 @@ open class MutableBigInteger {
         y -= x
         rstart -= x
 
-        val len = Math.min(y, addend.value.size - addend.offset)
+        val len = kotlin.math.min(y, addend.value.size - addend.offset)
         arraycopyk(addend.value, addend.offset, result, rstart + 1 - y, len)
 
         // zero the gap
@@ -1226,7 +1226,7 @@ open class MutableBigInteger {
 
         // Cancel common powers of two if we're above the KNUTH_POW2_* thresholds
         if (intLen >= KNUTH_POW2_THRESH_LEN) {
-            val trailingZeroBits = Math.min(lowestSetBit, b.lowestSetBit)
+            val trailingZeroBits = kotlin.math.min(lowestSetBit, b.lowestSetBit)
             if (trailingZeroBits >= KNUTH_POW2_THRESH_ZEROS * 32) {
                 val a = MutableBigInteger(this)
                 b = MutableBigInteger(b)
@@ -1273,7 +1273,7 @@ open class MutableBigInteger {
             val j = (s + m - 1) / m      // step 2a: j = ceil(s/m)
             val n = j * m            // step 2b: block length in 32-bit units
             val n32 = 32L * n         // block length in bits
-            val sigma = Math.max(0, n32 - b.bitLength()).toInt()   // step 3: sigma = max{T | (2^T)*B < beta^n}
+            val sigma = kotlin.math.max(0, n32 - b.bitLength()).toInt()   // step 3: sigma = max{T | (2^T)*B < beta^n}
             val bShifted = MutableBigInteger(b)
             bShifted.safeLeftShift(sigma)   // step 4a: shift b so its length is a multiple of n
             val aShifted = MutableBigInteger(this)
@@ -1707,7 +1707,7 @@ open class MutableBigInteger {
         val q = quotient.value
 
         // D1 normalize the divisor
-        val shift = java.lang.Long.numberOfLeadingZeros(ldivisor)
+        val shift = ldivisor.countLeadingZeroBits()
         if (shift > 0) {
             ldivisor = ldivisor shl shift
             rem.leftShift(shift)
@@ -1843,7 +1843,7 @@ open class MutableBigInteger {
      * Returns true iff one is bigger than two.
      */
     private fun unsignedLongCompare(one: Long, two: Long): Boolean {
-        return one + java.lang.Long.MIN_VALUE > two + java.lang.Long.MIN_VALUE
+        return one + Long.MIN_VALUE > two + Long.MIN_VALUE
     }
 
     /**
@@ -1871,7 +1871,7 @@ open class MutableBigInteger {
         if (bitLength() <= 63) {
             // Initial estimate is the square root of the positive long value.
             val v = BigInteger(this.value, 1).longValueExact()
-            var xk = Math.floor(Math.sqrt(v.toDouble())).toLong()
+            var xk = kotlin.math.floor(kotlin.math.sqrt(v.toDouble())).toLong()
 
             // Refine the estimate.
             do {
@@ -1906,7 +1906,7 @@ open class MutableBigInteger {
 
             // Use the square root of the shifted value as an approximation.
             val d = BigInteger(xk.value, 1).doubleValue()
-            val bi = BigInteger.valueOf(Math.ceil(Math.sqrt(d)).toLong())
+            val bi = BigInteger.valueOf(kotlin.math.ceil(kotlin.math.sqrt(d)).toLong())
             xk = MutableBigInteger(bi.mag)
 
             // Shift the approximate square root back into the original range.
@@ -1944,7 +1944,7 @@ open class MutableBigInteger {
         val q = MutableBigInteger()
 
         while (b.intLen != 0) {
-            if (Math.abs(a.intLen - b.intLen) < 2)
+            if (kotlin.math.abs(a.intLen - b.intLen) < 2)
                 return a.binaryGCD(b)
 
             val r = a.divide(b, q)
