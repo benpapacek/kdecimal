@@ -1909,7 +1909,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         if (signum == 0)
             return ZERO
 
-        val base = mag.clone()
+        val base = mag.copyOf()
         val exp = y.mag
         var mod = z.mag
         var modLen = mod.size
@@ -2043,7 +2043,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             // Perform multiply
             if (ebits == multpos) {
                 if (isone) {
-                    b = mult!!.clone()
+                    b = mult!!.copyOf()
                     isone = false
                 } else {
                     t = b
@@ -4860,7 +4860,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
 
             var pc = powerCache // volatile read again
             if (exponent >= pc!![radix]!!.size) {
-                pc = pc.clone()
+                pc = pc.copyOf()
                 pc[radix] = cacheLine
                 powerCache = pc // volatile write, publish
             }
