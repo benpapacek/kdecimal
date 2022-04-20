@@ -25,6 +25,9 @@
 
 package com.papacekb.kdecimal.jdk.internal.math
 
+import com.papacekb.kdecimal.java.util.FLOAT_MIN_EXPONENT
+import com.papacekb.kdecimal.java.util.assertK
+
 /**
  * This class contains additional constants documenting limits of the
  * `float` type.
@@ -44,7 +47,7 @@ object FloatConsts {
      * The exponent the smallest positive `float` subnormal
      * value would have if it could be normalized.
      */
-    val MIN_SUB_EXPONENT = java.lang.Float.MIN_EXPONENT - (SIGNIFICAND_WIDTH - 1)
+    val MIN_SUB_EXPONENT = FLOAT_MIN_EXPONENT - (SIGNIFICAND_WIDTH - 1)
 
     /**
      * Bias used in representing a `float` exponent.
@@ -77,7 +80,7 @@ object FloatConsts {
     init {
         // verify bit masks cover all bit positions and that the bit
         // masks are non-overlapping
-        assert(
+        assertK(
             SIGN_BIT_MASK or EXP_BIT_MASK or SIGNIF_BIT_MASK == 0.inv() &&
                     SIGN_BIT_MASK and EXP_BIT_MASK == 0 &&
                     SIGN_BIT_MASK and SIGNIF_BIT_MASK == 0 &&

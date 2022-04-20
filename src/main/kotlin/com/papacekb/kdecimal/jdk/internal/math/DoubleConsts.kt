@@ -25,6 +25,9 @@
 
 package com.papacekb.kdecimal.jdk.internal.math
 
+import com.papacekb.kdecimal.java.util.DOUBLE_MIN_EXPONENT
+import com.papacekb.kdecimal.java.util.assertK
+
 /**
  * This class contains additional constants documenting limits of the
  * `double` type.
@@ -44,7 +47,7 @@ object DoubleConsts {
      * The exponent the smallest positive `double`
      * subnormal value would have if it could be normalized..
      */
-    val MIN_SUB_EXPONENT = java.lang.Double.MIN_EXPONENT - (SIGNIFICAND_WIDTH - 1)
+    val MIN_SUB_EXPONENT = DOUBLE_MIN_EXPONENT - (SIGNIFICAND_WIDTH - 1)
 
     /**
      * Bias used in representing a `double` exponent.
@@ -77,7 +80,7 @@ object DoubleConsts {
     init {
         // verify bit masks cover all bit positions and that the bit
         // masks are non-overlapping
-        assert(
+        assertK(
             SIGN_BIT_MASK or EXP_BIT_MASK or SIGNIF_BIT_MASK == 0L.inv() &&
                     SIGN_BIT_MASK and EXP_BIT_MASK == 0L &&
                     SIGN_BIT_MASK and SIGNIF_BIT_MASK == 0L &&

@@ -30,7 +30,9 @@
 package com.papacekb.kdecimal.java.math
 
 import com.papacekb.kdecimal.java.util.Objects
+import com.papacekb.kdecimal.java.util.assertK
 import com.papacekb.kdecimal.java.util.digit
+import kotlin.math.sign
 
 /**
  * Immutable, arbitrary-precision signed decimal numbers.  A `BigDecimal` consists of an arbitrary precision integer
@@ -452,7 +454,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                         // two dots
                             throw NumberFormatException("Character array" + " contains more than one decimal point.")
                         dot = true
-                    } else if (Character.isDigit(c)) { // slow path
+                    } else if (c.isDigit()) { // slow path
                         val digit = c.digit(10)
                         if (digit == 0) {
                             if (prec == 0)
@@ -509,7 +511,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                 while (len > 0) {
                     c = `in`[offset]
                     // have digit
-                    if (c >= '0' && c <= '9' || Character.isDigit(c)) {
+                    if (c >= '0' && c <= '9' || c.isDigit()) {
                         // First compact case, we need not to preserve the character
                         // and we can just compute the value in place.
                         if (c == '0' || c.digit(10) == 0) {
@@ -593,14 +595,8 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                     }
                 }
             }
-        } catch (e: ArrayIndexOutOfBoundsException) {
-            val nfe = NumberFormatException()
-            nfe.initCause(e)
-            throw nfe
-        } catch (e: NegativeArraySizeException) {
-            val nfe = NumberFormatException()
-            nfe.initCause(e)
-            throw nfe
+        } catch (e: Exception) {
+            throw IllegalStateException(e)
         }
 
         this.scale = scl
@@ -612,7 +608,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
     private fun adjustScale(scl: Int, exp: Long): Int {
         var scl = scl
         val adjustedScale = scl - exp
-        if (adjustedScale > Int.MAX_VALUE || adjustedScale < Integer.MIN_VALUE)
+        if (adjustedScale > Int.MAX_VALUE || adjustedScale < Int.MIN_VALUE)
             throw NumberFormatException("Scale out of range.")
         scl = adjustedScale.toInt()
         return scl
@@ -657,7 +653,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
      * The exponent consists of the character `'e'`
      * (`'&#92;u0065'`) or `'E'` (`'&#92;u0045'`)
      * followed by one or more decimal digits.  The value of the
-     * exponent must lie between -[Int.MAX_VALUE] ([ ][Integer.MIN_VALUE]+1) and [Int.MAX_VALUE], inclusive.
+     * exponent must lie between -[Int.MAX_VALUE] ([ ][Int.MIN_VALUE]+1) and [Int.MAX_VALUE], inclusive.
      *
      *
      * More formally, the strings this constructor accepts are
@@ -777,11 +773,11 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
      * @since  1.5
      */
     constructor(`val`: Double, mc: MathContext = MathContext.UNLIMITED) {
-        if (java.lang.Double.isInfinite(`val`) || java.lang.Double.isNaN(`val`))
+        if (`val`.isInfinite() || `val`.isNaN())
             throw NumberFormatException("Infinite or NaN")
         // Translate the double into sign, exponent and significand, according
         // to the formulae in JLS, Section 20.10.22.
-        val valBits = java.lang.Double.doubleToLongBits(`val`)
+        val valBits = `val`.toRawBits()
         val sign = if (valBits shr 63 == 0L) 1 else -1
         var exponent = (valBits shr 52 and 0x7ffL).toInt()
         var significand = if (exponent == 0)
@@ -1168,7 +1164,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
      * reduced even though the significands partially overlapped.
      */
     private fun preAlign(lhs: BigDecimal, augend: BigDecimal, padding: Long, mc: MathContext): Array<BigDecimal> {
-        assert(padding != 0L)
+        assertK(padding != 0L)
         val big: BigDecimal
         var small: BigDecimal
 
@@ -1918,7 +1914,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
 
             val working = stripped.scaleByPowerOfTen(scaleAdjust)
 
-            assert(// Verify 0.1 <= working < 10
+            assertK(// Verify 0.1 <= working < 10
                 ONE_TENTH.compareTo(working) <= 0 && working.compareTo(TEN) < 0
             )
 
@@ -2047,7 +2043,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
 
             // Test numerical properties at full precision before any
             // scale adjustments.
-            assert(squareRootResultAssertions(result!!, mc))
+            assertK(squareRootResultAssertions(result!!, mc))
             if (result.scale() != preferredScale) {
                 // The preferred scale of an add is
                 // max(addend.scale(), augend.scale()). Therefore, if
@@ -2068,7 +2064,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                 -1 -> throw ArithmeticException("Attempted square root " + "of negative BigDecimal")
                 0 -> {
                     result = valueOf(0L, scale() / 2)
-                    assert(squareRootResultAssertions(result, mc))
+                    assertK(squareRootResultAssertions(result, mc))
                     return result
                 }
 
@@ -2110,18 +2106,18 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             val neighborDown = result.subtract(ulp)
 
             // Both the starting value and result should be nonzero and positive.
-            assert(result.signum() == 1 && this.signum() == 1) { "Bad signum of this and/or its sqrt." }
+            assertK(result.signum() == 1 && this.signum() == 1) { "Bad signum of this and/or its sqrt." }
 
             when (rm) {
                 RoundingMode.DOWN, RoundingMode.FLOOR -> {
-                    assert(
+                    assertK(
                         result.square().compareTo(this) <= 0 && neighborUp.square().compareTo(this) > 0
                     ) { "Square of result out for bounds rounding $rm" }
                     return true
                 }
 
                 RoundingMode.UP, RoundingMode.CEILING -> {
-                    assert(
+                    assertK(
                         result.square().compareTo(this) >= 0 && neighborDown.square().compareTo(this) < 0
                     ) { "Square of result out for bounds rounding $rm" }
                     return true
@@ -2138,7 +2134,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                     val err_comp_errUp = err.compareTo(errUp)
                     val err_comp_errDown = err.compareTo(errDown)
 
-                    assert(errUp.signum() == 1 && errDown.signum() == 1) { "Errors of neighbors squared don't have correct signs" }
+                    assertK(errUp.signum() == 1 && errDown.signum() == 1) { "Errors of neighbors squared don't have correct signs" }
 
                     // For breaking a half-way tie, the return value may
                     // have a larger error than one of the neighbors. For
@@ -2146,9 +2142,9 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                     // 1 digit is either 1 or 2 depending on how the exact
                     // value of 1.5 is rounded. If 2 is returned, it will
                     // have a larger rounding error than its neighbor 1.
-                    assert(err_comp_errUp <= 0 || err_comp_errDown <= 0) { "Computed square root has larger error than neighbors for $rm" }
+                    assertK(err_comp_errUp <= 0 || err_comp_errDown <= 0) { "Computed square root has larger error than neighbors for $rm" }
 
-                    assert((if (err_comp_errUp == 0) err_comp_errDown < 0 else true) && if (err_comp_errDown == 0) err_comp_errUp < 0 else true) { "Incorrect error relationships" }
+                    assertK((if (err_comp_errUp == 0) err_comp_errDown < 0 else true) && if (err_comp_errDown == 0) err_comp_errUp < 0 else true) { "Incorrect error relationships" }
                     // && could check for digit conditions for ties too
                     return true
                 }
@@ -2377,7 +2373,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
      */
     fun signum(): Int {
         return if (intCompact != INFLATED)
-            java.lang.Long.signum(intCompact)
+            intCompact.sign
         else
             intVal!!.signum()
     }
@@ -2650,7 +2646,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
     fun movePointLeft(n: Int): BigDecimal {
         if (n == 0) return this
 
-        // Cannot use movePointRight(-n) in case of n==Integer.MIN_VALUE
+        // Cannot use movePointRight(-n) in case of n==Int.MIN_VALUE
         val newScale = checkScale(scale.toLong() + n)
         val num = BigDecimal(intVal, intCompact, newScale, 0)
         return if (num.scale < 0) num.setScale(0, ROUND_UNNECESSARY) else num
@@ -2674,7 +2670,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
     fun movePointRight(n: Int): BigDecimal {
         if (n == 0) return this
 
-        // Cannot use movePointLeft(-n) in case of n==Integer.MIN_VALUE
+        // Cannot use movePointLeft(-n) in case of n==Int.MIN_VALUE
         val newScale = checkScale(scale.toLong() - n)
         val num = BigDecimal(intVal, intCompact, newScale, 0)
         return if (num.scale < 0) num.setScale(0, ROUND_UNNECESSARY) else num
@@ -2720,9 +2716,9 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         return if (intCompact == 0L || intVal != null && intVal.signum() == 0) {
             BigDecimal.ZERO
         } else if (intCompact != INFLATED) {
-            createAndStripZerosToMatchScale(intCompact, scale, java.lang.Long.MIN_VALUE)
+            createAndStripZerosToMatchScale(intCompact, scale, Long.MIN_VALUE)
         } else {
-            createAndStripZerosToMatchScale(intVal!!, scale, java.lang.Long.MIN_VALUE)
+            createAndStripZerosToMatchScale(intVal!!, scale, Long.MIN_VALUE)
         }
     }
 
@@ -2789,9 +2785,9 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             if (xae > yae)
                 return 1
             if (sdiff < 0) {
-                // The cases sdiff <= Integer.MIN_VALUE intentionally fall through.
+                // The cases sdiff <= Int.MIN_VALUE intentionally fall through.
                 val z = longMultiplyPowerTen(xs, (-sdiff).toInt())
-                if (sdiff > Integer.MIN_VALUE &&
+                if (sdiff > Int.MIN_VALUE &&
                     (xs == INFLATED || z == INFLATED) &&
                     ys == INFLATED
                 ) {
@@ -3097,7 +3093,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
     fun toPlainString(): String {
         if (scale == 0) {
             return if (intCompact != INFLATED) {
-                java.lang.Long.toString(intCompact)
+                intCompact.toString()
             } else {
                 intVal!!.toString()
             }
@@ -3123,7 +3119,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         }
         val str: String
         if (intCompact != INFLATED) {
-            str = java.lang.Long.toString(kotlin.math.abs(intCompact))
+            str = kotlin.math.abs(intCompact).toString()
         } else {
             str = intVal!!.abs().toString()
         }
@@ -3235,7 +3231,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
      * than one; i.e. only has fraction digits.
      */
     private fun fractionOnly(): Boolean {
-        assert(this.signum() != 0)
+        assertK(this.signum() != 0)
         return this.precision() - this.scale <= 0
     }
 
@@ -3267,7 +3263,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         // If more than 19 digits in integer part it cannot possibly fit
         if (precision() - scale > 19)
         // [OK for negative scale too]
-            throw java.lang.ArithmeticException("Overflow")
+            throw ArithmeticException("Overflow")
 
         // round to an integer, with Exception if decimal part non-0
         val num = this.setScale(0, ROUND_UNNECESSARY)
@@ -3279,15 +3275,15 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
 
     private object LongOverflow {
         /** BigInteger equal to Long.MIN_VALUE.  */
-        private val LONGMIN = BigInteger.valueOf(java.lang.Long.MIN_VALUE)
+        private val LONGMIN = BigInteger.valueOf(Long.MIN_VALUE)
 
         /** BigInteger equal to Long.MAX_VALUE.  */
-        private val LONGMAX = BigInteger.valueOf(java.lang.Long.MAX_VALUE)
+        private val LONGMAX = BigInteger.valueOf(Long.MAX_VALUE)
 
         fun check(num: BigDecimal) {
             val intVal = num.inflated()
             if (intVal!!.compareTo(LONGMIN!!) < 0 || intVal.compareTo(LONGMAX!!) > 0)
-                throw java.lang.ArithmeticException("Overflow")
+                throw ArithmeticException("Overflow")
         }
     }
 
@@ -3331,7 +3327,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         val num: Long
         num = this.longValueExact()     // will check decimal part
         if (num.toInt().toLong() != num)
-            throw java.lang.ArithmeticException("Overflow")
+            throw ArithmeticException("Overflow")
         return num.toInt()
     }
 
@@ -3351,7 +3347,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         val num: Long
         num = this.longValueExact()     // will check decimal part
         if (num.toShort().toLong() != num)
-            throw java.lang.ArithmeticException("Overflow")
+            throw ArithmeticException("Overflow")
         return num.toShort()
     }
 
@@ -3371,7 +3367,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         val num: Long
         num = this.longValueExact()     // will check decimal part
         if (num.toByte().toLong() != num)
-            throw java.lang.ArithmeticException("Overflow")
+            throw ArithmeticException("Overflow")
         return num.toByte()
     }
 
@@ -3415,7 +3411,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             }
         }
         // Somewhat inefficient, but guaranteed to work.
-        return java.lang.Float.parseFloat(this.toString())
+        return this.toString().toFloat()
     }
 
     /**
@@ -3458,7 +3454,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             }
         }
         // Somewhat inefficient, but guaranteed to work.
-        return java.lang.Double.parseDouble(this.toString())
+        return this.toString().toDouble()
     }
 
     /**
@@ -3512,7 +3508,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
          */
         fun putIntCompact(intCompact: Long): Int {
             var intCompact = intCompact
-            assert(intCompact >= 0)
+            assertK(intCompact >= 0)
 
             var q: Long
             var r: Int
@@ -3770,7 +3766,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         if (scale == 0)
         // zero scale is trivial
             return if (intCompact != INFLATED)
-                java.lang.Long.toString(intCompact)
+                intCompact.toString()
             else
                 intVal!!.toString()
         if (scale == 2 &&
@@ -3779,7 +3775,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             // currency fast path
             val lowInt = intCompact.toInt() % 100
             val highInt = intCompact.toInt() / 100
-            return Integer.toString(highInt) + '.'.toString() +
+            return highInt.toString() + '.'.toString() +
                     StringBuilderHelper.DIGIT_TENS[lowInt] +
                     StringBuilderHelper.DIGIT_ONES[lowInt]
         }
@@ -3906,7 +3902,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
     private fun checkScale(`val`: Long): Int {
         var asInt = `val`.toInt()
         if (asInt.toLong() != `val`) {
-            asInt = if (`val` > Int.MAX_VALUE) Int.MAX_VALUE else Integer.MIN_VALUE
+            asInt = if (`val` > Int.MAX_VALUE) Int.MAX_VALUE else Int.MIN_VALUE
             val b: BigInteger?
             b = intVal
             if (intCompact != 0L && (b == null || b!!.signum() != 0))
@@ -3971,7 +3967,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
          * Sentinel value for [.intCompact] indicating the
          * significand information is only available from `intVal`.
          */
-        val INFLATED = java.lang.Long.MIN_VALUE
+        val INFLATED = Long.MIN_VALUE
 
         private val INFLATED_BIGINT = BigInteger.valueOf(INFLATED)
 
@@ -4019,8 +4015,8 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         )
 
         // Half of Long.MIN_VALUE & Long.MAX_VALUE.
-        private val HALF_LONG_MAX_VALUE = java.lang.Long.MAX_VALUE / 2
-        private val HALF_LONG_MIN_VALUE = java.lang.Long.MIN_VALUE / 2
+        private val HALF_LONG_MAX_VALUE = Long.MAX_VALUE / 2
+        private val HALF_LONG_MIN_VALUE = Long.MIN_VALUE / 2
 
         // Constants
         /**
@@ -4206,7 +4202,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             // to use the constant ZERO.  This might be important enough to
             // justify a factory approach, a cache, or a few private
             // constants, later.
-            return BigDecimal(java.lang.Double.toString(`val`))
+            return BigDecimal(`val`.toString())
         }
 
         // Rounding Modes
@@ -4363,7 +4359,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
          * expanded to the size greater than n.
          */
         private fun expandBigIntegerTenPowers(n: Int): BigInteger {
-            synchronized(BigDecimal::class.java) {
+//            synchronized(BigDecimal::class.java) {
                 var pows: Array<BigInteger?> = BIG_TEN_POWERS_TABLE
                 val curLen = pows.size
                 // The following comparison and the above synchronized statement is
@@ -4384,7 +4380,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                     BIG_TEN_POWERS_TABLE = pows
                 }
                 return pows[n]!!
-            }
+//            }
         }
 
         private val LONG_TEN_POWERS_TABLE = longArrayOf(
@@ -4409,7 +4405,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             1000000000000000000L   // 18 / 10^18
         )
 
-        @Volatile
+//        @Volatile
         private var BIG_TEN_POWERS_TABLE = arrayOf<BigInteger?>(
             BigInteger.ONE,
             BigInteger.valueOf(10),
@@ -4436,25 +4432,25 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         private val BIG_TEN_POWERS_TABLE_MAX = 16 * BIG_TEN_POWERS_TABLE_INITLEN
 
         private val THRESHOLDS_TABLE = longArrayOf(
-            java.lang.Long.MAX_VALUE, // 0
-            java.lang.Long.MAX_VALUE / 10L, // 1
-            java.lang.Long.MAX_VALUE / 100L, // 2
-            java.lang.Long.MAX_VALUE / 1000L, // 3
-            java.lang.Long.MAX_VALUE / 10000L, // 4
-            java.lang.Long.MAX_VALUE / 100000L, // 5
-            java.lang.Long.MAX_VALUE / 1000000L, // 6
-            java.lang.Long.MAX_VALUE / 10000000L, // 7
-            java.lang.Long.MAX_VALUE / 100000000L, // 8
-            java.lang.Long.MAX_VALUE / 1000000000L, // 9
-            java.lang.Long.MAX_VALUE / 10000000000L, // 10
-            java.lang.Long.MAX_VALUE / 100000000000L, // 11
-            java.lang.Long.MAX_VALUE / 1000000000000L, // 12
-            java.lang.Long.MAX_VALUE / 10000000000000L, // 13
-            java.lang.Long.MAX_VALUE / 100000000000000L, // 14
-            java.lang.Long.MAX_VALUE / 1000000000000000L, // 15
-            java.lang.Long.MAX_VALUE / 10000000000000000L, // 16
-            java.lang.Long.MAX_VALUE / 100000000000000000L, // 17
-            java.lang.Long.MAX_VALUE / 1000000000000000000L // 18
+            Long.MAX_VALUE, // 0
+            Long.MAX_VALUE / 10L, // 1
+            Long.MAX_VALUE / 100L, // 2
+            Long.MAX_VALUE / 1000L, // 3
+            Long.MAX_VALUE / 10000L, // 4
+            Long.MAX_VALUE / 100000L, // 5
+            Long.MAX_VALUE / 1000000L, // 6
+            Long.MAX_VALUE / 10000000L, // 7
+            Long.MAX_VALUE / 100000000L, // 8
+            Long.MAX_VALUE / 1000000000L, // 9
+            Long.MAX_VALUE / 10000000000L, // 10
+            Long.MAX_VALUE / 100000000000L, // 11
+            Long.MAX_VALUE / 1000000000000L, // 12
+            Long.MAX_VALUE / 10000000000000L, // 13
+            Long.MAX_VALUE / 100000000000000L, // 14
+            Long.MAX_VALUE / 1000000000000000L, // 15
+            Long.MAX_VALUE / 10000000000000000L, // 16
+            Long.MAX_VALUE / 100000000000000000L, // 17
+            Long.MAX_VALUE / 1000000000000000000L // 18
         )
 
         /**
@@ -4575,13 +4571,13 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
          * downward from the LONG_TEN_POWERS_TABLE that we need
          * anyway.
          */
-            assert(x != BigDecimal.INFLATED)
+            assertK(x != BigDecimal.INFLATED)
             if (x < 0)
                 x = -x
             if (x < 10)
             // must screen for 0, might as well 10
                 return 1
-            val r = ((64 - java.lang.Long.numberOfLeadingZeros(x) + 1) * 1233).ushr(12)
+            val r = ((64 - x.countLeadingZeroBits() + 1) * 1233).ushr(12)
             val tab = LONG_TEN_POWERS_TABLE
             // if r >= length, must have max possible digits for long
             return if (r >= tab.size || x < tab[r]) r else r + 1
@@ -4634,25 +4630,20 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                 x = -x
             if (y < 0)
                 y = -y
-            return java.lang.Long.compare(x, y)
+            return x.compareTo(y)
         }
 
         private fun saturateLong(s: Long): Int {
             val i = s.toInt()
-            return if (s == i.toLong()) i else if (s < 0) Integer.MIN_VALUE else Int.MAX_VALUE
+            return if (s == i.toLong()) i else if (s < 0) Int.MIN_VALUE else Int.MAX_VALUE
         }
 
         /*
      * Internal printing routine
      */
         private fun print(name: String, bd: BigDecimal) {
-            System.err.format(
-                "%s:\tintCompact %d\tintVal %d\tscale %d\tprecision %d%n",
-                name,
-                bd.intCompact,
-                bd.intVal,
-                bd.scale,
-                bd.precision
+            println(
+                "$name:\tintCompact ${bd.intCompact}\tintVal ${bd.intVal}\tscale ${bd.scale}\tprecision ${bd.precision}",
             )
         }
 
@@ -4668,7 +4659,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         private fun checkScale(intCompact: Long, `val`: Long): Int {
             var asInt = `val`.toInt()
             if (asInt.toLong() != `val`) {
-                asInt = if (`val` > Int.MAX_VALUE) Int.MAX_VALUE else Integer.MIN_VALUE
+                asInt = if (`val` > Int.MAX_VALUE) Int.MAX_VALUE else Int.MIN_VALUE
                 if (intCompact != 0L)
                     throw ArithmeticException(if (asInt > 0) "Underflow" else "Overflow")
             }
@@ -4678,7 +4669,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         private fun checkScale(intVal: BigInteger?, `val`: Long): Int {
             var asInt = `val`.toInt()
             if (asInt.toLong() != `val`) {
-                asInt = if (`val` > Int.MAX_VALUE) Int.MAX_VALUE else Integer.MIN_VALUE
+                asInt = if (`val` > Int.MAX_VALUE) Int.MAX_VALUE else Int.MIN_VALUE
                 if (intVal!!.signum() != 0)
                     throw ArithmeticException(if (asInt > 0) "Underflow" else "Overflow")
             }
@@ -4889,7 +4880,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
 
                 else // Some kind of half-way rounding
                 -> {
-                    assert(roundingMode >= ROUND_HALF_UP && roundingMode <= ROUND_HALF_EVEN) {
+                    assertK(roundingMode >= ROUND_HALF_UP && roundingMode <= ROUND_HALF_EVEN) {
                         "Unexpected rounding mode" + RoundingMode.valueOf(
                             roundingMode
                         )
@@ -4902,7 +4893,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                     // We're closer to lower digit
                         return true
                     else { // half-way
-                        assert(cmpFracHalf == 0)
+                        assertK(cmpFracHalf == 0)
 
                         return when (roundingMode) {
                             ROUND_HALF_DOWN -> false;
@@ -4923,7 +4914,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             ldivisor: Long, roundingMode: Int,
             qsign: Int, q: Long, r: Long
         ): Boolean {
-            assert(r != 0L)
+            assertK(r != 0L)
 
             val cmpFracHalf: Int
             if (r <= HALF_LONG_MIN_VALUE || r > HALF_LONG_MAX_VALUE) {
@@ -5007,7 +4998,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             ldivisor: Long, roundingMode: Int,
             qsign: Int, mq: MutableBigInteger, r: Long
         ): Boolean {
-            assert(r != 0L)
+            assertK(r != 0L)
 
             val cmpFracHalf: Int
             if (r <= HALF_LONG_MIN_VALUE || r > HALF_LONG_MAX_VALUE) {
@@ -5089,7 +5080,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             mdivisor: MutableBigInteger, roundingMode: Int,
             qsign: Int, mq: MutableBigInteger, mr: MutableBigInteger
         ): Boolean {
-            assert(!mr.isZero)
+            assertK(!mr.isZero)
             val cmpFracHalf = mr.compareHalf(mdivisor)
             return commonNeedIncrement(roundingMode, qsign, cmpFracHalf, mq.isOdd)
         }
@@ -5098,7 +5089,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
          * Remove insignificant trailing zeros from this
          * `BigInteger` value until the preferred scale is reached or no
          * more zeros can be removed.  If the preferred scale is less than
-         * Integer.MIN_VALUE, all the trailing zeros will be removed.
+         * Int.MIN_VALUE, all the trailing zeros will be removed.
          *
          * @return new `BigDecimal` with a scale possibly reduced
          * to be closed to the preferred scale.
@@ -5124,7 +5115,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
          * Remove insignificant trailing zeros from this
          * `long` value until the preferred scale is reached or no
          * more zeros can be removed.  If the preferred scale is less than
-         * Integer.MIN_VALUE, all the trailing zeros will be removed.
+         * Int.MIN_VALUE, all the trailing zeros will be removed.
          *
          * @return new `BigDecimal` with a scale possibly reduced
          * to be closed to the preferred scale.
@@ -5217,7 +5208,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             var snd = snd
             var rscale = scale1
             val sdiff = rscale.toLong() - scale2
-            val sameSigns = java.lang.Long.signum(xs) == snd.signum
+            val sameSigns = xs.sign == snd.signum
             val sum: BigInteger?
             if (sdiff < 0) {
                 val raise = checkScale(xs, -sdiff)
@@ -5289,7 +5280,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             val mcp = mc.precision
             val roundingMode = mc.roundingMode.oldMode
 
-            assert(xscale <= yscale && yscale < 18 && mcp < 18)
+            assertK(xscale <= yscale && yscale < 18 && mcp < 18)
             val xraise = yscale - xscale // xraise >=0
             val scaledX = if (xraise == 0)
                 xs
@@ -5594,7 +5585,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
             var dividend1 = dividend1
             var divisor = divisor
             val qsign =
-                java.lang.Long.signum(dividend0) * java.lang.Long.signum(dividend1) * java.lang.Long.signum(divisor)
+                dividend0.sign * dividend1.sign * divisor.sign
             dividend0 = kotlin.math.abs(dividend0)
             dividend1 = kotlin.math.abs(dividend1)
             divisor = kotlin.math.abs(divisor)
@@ -5639,7 +5630,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                 return null
             }
 
-            val shift = java.lang.Long.numberOfLeadingZeros(divisor)
+            val shift = divisor.countLeadingZeroBits()
             divisor = divisor shl shift
 
             val v1 = divisor.ushr(32)
@@ -5775,8 +5766,8 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
          * the initial and final elements, respectively
          */
         private fun divRemNegativeLong(n: Long, d: Long): LongArray {
-            assert(n < 0) { "Non-negative numerator $n" }
-            assert(d != 1L) { "Unity denominator" }
+            assertK(n < 0) { "Non-negative numerator $n" }
+            assertK(d != 1L) { "Unity denominator" }
 
             // Approximate the quotient and remainder
             var q = n.ushr(1) / d.ushr(1)
@@ -5806,11 +5797,11 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         }
 
         private fun unsignedLongCompare(one: Long, two: Long): Boolean {
-            return one + java.lang.Long.MIN_VALUE > two + java.lang.Long.MIN_VALUE
+            return one + Long.MIN_VALUE > two + Long.MIN_VALUE
         }
 
         private fun unsignedLongCompareEq(one: Long, two: Long): Boolean {
-            return one + java.lang.Long.MIN_VALUE >= two + java.lang.Long.MIN_VALUE
+            return one + Long.MIN_VALUE >= two + Long.MIN_VALUE
         }
 
 
@@ -5996,7 +5987,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
                 return if (unsignedLongCompareEq(lo, LONGLONG_TEN_POWERS_TABLE[0][1])) 20 else 19
                 // 0x8AC7230489E80000L  = unsigned 2^19
             }
-            val r = ((128 - java.lang.Long.numberOfLeadingZeros(hi) + 1) * 1233).ushr(12)
+            val r = ((128 - hi.countLeadingZeroBits() + 1) * 1233).ushr(12)
             val idx = r - 19
             return if (idx >= LONGLONG_TEN_POWERS_TABLE.size || longLongCompareMagnitude(
                     hi, lo,
@@ -6015,7 +6006,7 @@ class BigDecimal : com.papacekb.kdecimal.java.lang.Number, Comparable<BigDecimal
         private fun longLongCompareMagnitude(hi0: Long, lo0: Long, hi1: Long, lo1: Long): Boolean {
             return if (hi0 != hi1) {
                 hi0 < hi1
-            } else lo0 + java.lang.Long.MIN_VALUE < lo1 + java.lang.Long.MIN_VALUE
+            } else lo0 + Long.MIN_VALUE < lo1 + Long.MIN_VALUE
         }
 
         private fun divide(

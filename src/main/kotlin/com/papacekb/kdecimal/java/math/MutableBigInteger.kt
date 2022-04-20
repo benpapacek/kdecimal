@@ -25,6 +25,8 @@
 
 package com.papacekb.kdecimal.java.math
 
+import com.papacekb.kdecimal.java.util.assertK
+
 /**
  * A class used to represent multiprecision integers that makes efficient
  * use of allocated space by allowing a number to occupy only part of
@@ -96,7 +98,7 @@ open class MutableBigInteger {
                 j--
             }
             b = value[j + offset]
-            return if (b == 0) -1 else (intLen - 1 - j shl 5) + Integer.numberOfTrailingZeros(b)
+            return if (b == 0) -1 else (intLen - 1 - j shl 5) + b.countTrailingZeroBits()
         }
 
     /**
@@ -201,7 +203,7 @@ open class MutableBigInteger {
      * sure this MutableBigInteger can be fit into long.
      */
     private fun toLong(): Long {
-        assert(intLen <= 2) { "this MutableBigInteger exceeds the range of long" }
+        assertK(intLen <= 2) { "this MutableBigInteger exceeds the range of long" }
         if (intLen == 0)
             return 0
         val d = value[offset].toLong() and BigInteger.LONG_MASK
@@ -2319,8 +2321,8 @@ open class MutableBigInteger {
                 return b
 
             // Right shift a & b till their last bits equal to 1.
-            val aZeros = Integer.numberOfTrailingZeros(a)
-            val bZeros = Integer.numberOfTrailingZeros(b)
+            val aZeros = a.countTrailingZeroBits()
+            val bZeros = b.countTrailingZeroBits()
             a = a ushr aZeros
             b = b ushr bZeros
 
@@ -2329,10 +2331,10 @@ open class MutableBigInteger {
             while (a != b) {
                 if (a + -0x80000000 > b + -0x80000000) {  // a > b as unsigned
                     a -= b
-                    a = a ushr Integer.numberOfTrailingZeros(a)
+                    a = a ushr a.countTrailingZeroBits()
                 } else {
                     b -= a
-                    b = b ushr Integer.numberOfTrailingZeros(b)
+                    b = b ushr b.countTrailingZeroBits()
                 }
             }
             return a shl t
@@ -2362,7 +2364,7 @@ open class MutableBigInteger {
             t *= 2 - `val` * t
             t *= 2 - `val` * t
             t *= 2 - `val` * t
-            assert(t * `val` == 1L)
+            assertK(t * `val` == 1L)
             return t
         }
 

@@ -27,8 +27,13 @@ class BigDecimalTest {
     @Test
     fun foo() {
 //        println('d'.digitToIntOrNull() ?: -1)
-        println(java.lang.Math.log(421.0))
-        println(kotlin.math.ln(421.0))
+//        println(java.lang.Math.log(421.0))
+//        println(kotlin.math.ln(421.0))
+        println(java.lang.Double.doubleToLongBits(3.14159))
+        println(3.14159.toRawBits())
+
+        println(java.lang.Long.numberOfLeadingZeros(31459L))
+        println(31459L.countLeadingZeroBits())
     }
 
     @Test

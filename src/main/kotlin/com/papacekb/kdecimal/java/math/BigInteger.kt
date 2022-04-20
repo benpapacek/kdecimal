@@ -29,10 +29,10 @@
 
 package com.papacekb.kdecimal.java.math
 
-import com.papacekb.kdecimal.java.util.Objects
-import com.papacekb.kdecimal.java.util.digit
+import com.papacekb.kdecimal.java.util.*
 import com.papacekb.kdecimal.jdk.internal.math.DoubleConsts
 import com.papacekb.kdecimal.jdk.internal.math.FloatConsts
+import kotlin.math.sign
 
 /**
  * Immutable arbitrary-precision integers.  All operations behave as if
@@ -212,7 +212,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
                         b = getInt(i)
                         i++
                     }
-                    lsb += (i shl 5) + Integer.numberOfTrailingZeros(b)
+                    lsb += (i shl 5) + b.countTrailingZeroBits()
                 }
                 lowestSetBitPlusTwo = lsb + 2
             }
@@ -375,15 +375,15 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
      * @param radix radix to be used in interpreting `val`.
      * @throws NumberFormatException `val` is not a valid representation
      * of a BigInteger in the specified radix, or `radix` is
-     * outside the range from [Character.MIN_RADIX] to
-     * [Character.MAX_RADIX], inclusive.
+     * outside the range from [CHAR_MIN_RADIX] to
+     * [CHAR_MAX_RADIX], inclusive.
      */
     constructor(`val`: String, radix: Int = 10) {
         var cursor = 0
         val numDigits: Int
         val len = `val`.length
 
-        if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX)
+        if (radix < CHAR_MIN_RADIX || radix > CHAR_MAX_RADIX)
             throw NumberFormatException("Radix out of range")
         if (len == 0)
             throw NumberFormatException("Zero length BigInteger")
@@ -873,7 +873,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             return this
         if (signum == 0)
             return valueOf(`val`)
-        if (java.lang.Long.signum(`val`) == signum)
+        if (`val`.sign == signum)
             return BigInteger(add(mag, kotlin.math.abs(`val`)), signum)
         val cmp = compareMagnitude(`val`)
         if (cmp == 0)
@@ -1673,7 +1673,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
     fun sqrtAndRemainder(): Array<BigInteger> {
         val s = sqrt()
         val r = this.subtract(s.square())
-        assert(r.compareTo(BigInteger.ZERO) >= 0)
+        assertK(r.compareTo(BigInteger.ZERO) >= 0)
         return arrayOf(s, r)
     }
 
@@ -2518,7 +2518,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
                     magTrailingZeroCount += 32
                     j--
                 }
-                magTrailingZeroCount += Integer.numberOfTrailingZeros(mag[j])
+                magTrailingZeroCount += mag[j].countTrailingZeroBits()
                 bc += magTrailingZeroCount - 1
             }
             bitCountPlusOne = bc + 1
@@ -2609,7 +2609,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
      */
     internal fun compareMagnitude(`val`: Long): Int {
         var `val` = `val`
-        assert(`val` != java.lang.Long.MIN_VALUE)
+        assertK(`val` != Long.MIN_VALUE)
         val m1 = mag
         val len = m1.size
         if (len > 2) {
@@ -2717,7 +2717,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
 
     /**
      * Returns the String representation of this BigInteger in the
-     * given radix.  If the radix is outside the range from [ ][Character.MIN_RADIX] to [Character.MAX_RADIX] inclusive,
+     * given radix.  If the radix is outside the range from [ ][CHAR_MIN_RADIX] to [CHAR_MAX_RADIX] inclusive,
      * it will default to 10 (as is the case for
      * `Integer.toString`).  The digit-to-character mapping
      * provided by `Character.forDigit` is used, and a minus
@@ -2736,7 +2736,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         var radix = radix
         if (signum == 0)
             return "0"
-        if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX)
+        if (radix < CHAR_MIN_RADIX || radix > CHAR_MAX_RADIX)
             radix = 10
 
         val abs = this.abs()
@@ -2768,7 +2768,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
      * @param digits The minimum number of digits to pad to.
      */
     private fun smallToString(radix: Int, buf: StringBuilder, digits: Int) {
-        assert(signum >= 0)
+        assertK(signum >= 0)
 
         if (signum == 0) {
             padWithZeros(buf, digits)
@@ -2797,7 +2797,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         }
 
         // Get string version of first digit group
-        var s = java.lang.Long.toString(digitGroups[numGroups - 1], radix)
+        var s = digitGroups[numGroups - 1].toString(radix)
 
         // Pad with internal zeros if necessary.
         padWithZeros(buf, digits - (s.length + (numGroups - 1) * digitsPerLong[radix]))
@@ -2808,7 +2808,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         // Append remaining digit groups each padded with leading zeros
         for (i in numGroups - 2 downTo 0) {
             // Prepend (any) leading zeros for this digit group
-            s = java.lang.Long.toString(digitGroups[i], radix)
+            s = digitGroups[i].toString(radix)
             val numLeadingZeros = digitsPerLong[radix] - s.length
             if (numLeadingZeros != 0) {
                 buf.append(ZEROS, 0, numLeadingZeros)
@@ -2939,10 +2939,10 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         val exponent = (mag.size - 1 shl 5) + bitLengthForInt(mag[0]) - 1
 
         // exponent == floor(log2(abs(this)))
-        if (exponent < java.lang.Long.SIZE - 1) {
+        if (exponent < Long.SIZE_BITS - 1) {
             return longValue().toFloat()
-        } else if (exponent > java.lang.Float.MAX_EXPONENT) {
-            return if (signum > 0) java.lang.Float.POSITIVE_INFINITY else java.lang.Float.NEGATIVE_INFINITY
+        } else if (exponent > FLOAT_MAX_EXPONENT) {
+            return if (signum > 0) Float.POSITIVE_INFINITY else Float.NEGATIVE_INFINITY
         }
 
         /*
@@ -2995,7 +2995,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
          * Float.POSITIVE_INFINITY.
          */
         bits = bits or (signum and FloatConsts.SIGN_BIT_MASK)
-        return java.lang.Float.intBitsToFloat(bits)
+        return Float.fromBits(bits)
     }
 
     /**
@@ -3021,10 +3021,10 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         val exponent = (mag.size - 1 shl 5) + bitLengthForInt(mag[0]) - 1
 
         // exponent == floor(log2(abs(this))Double)
-        if (exponent < java.lang.Long.SIZE - 1) {
+        if (exponent < Long.SIZE_BITS - 1) {
             return longValue().toDouble()
-        } else if (exponent > java.lang.Double.MAX_EXPONENT) {
-            return if (signum > 0) java.lang.Double.POSITIVE_INFINITY else java.lang.Double.NEGATIVE_INFINITY
+        } else if (exponent > DOUBLE_MAX_EXPONENT) {
+            return if (signum > 0) Double.POSITIVE_INFINITY else Double.NEGATIVE_INFINITY
         }
 
         /*
@@ -3084,7 +3084,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
          * Double.POSITIVE_INFINITY.
          */
         bits = bits or (signum and DoubleConsts.SIGN_BIT_MASK.toInt()).toLong()
-        return java.lang.Double.longBitsToDouble(bits)
+        return Double.fromBits(bits)
     }
 
     /**
@@ -3343,7 +3343,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
     fun shortValueExact(): Short {
         if (mag.size <= 1 && bitLength() <= 31) {
             val value = intValue()
-            if (value >= java.lang.Short.MIN_VALUE && value <= java.lang.Short.MAX_VALUE)
+            if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE)
                 return shortValue()
         }
         throw ArithmeticException("BigInteger out of short range")
@@ -3365,7 +3365,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
     fun byteValueExact(): Byte {
         if (mag.size <= 1 && bitLength() <= 31) {
             val value = intValue()
-            if (value >= java.lang.Byte.MIN_VALUE && value <= java.lang.Byte.MAX_VALUE)
+            if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE)
                 return byteValue()
         }
         throw ArithmeticException("BigInteger out of byte range")
@@ -3712,7 +3712,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
                 if (u == 1)
                     return j
                 // Now both u and p are odd, so use quadratic reciprocity
-                assert(u < p)
+                assertK(u < p)
                 val t = u
                 u = p
                 p = t
@@ -3817,7 +3817,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
          * recalculate powers of radix^(2^n) more than once.  This speeds
          * Schoenhage recursive base conversion significantly.
          */
-        @Volatile
+//        @Volatile
         private var powerCache: Array<Array<BigInteger?>?>
 
         /** The cache of logarithms of radices for base conversion.  */
@@ -3827,7 +3827,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
         private val LOG_TWO = kotlin.math.ln(2.0)
 
         init {
-            assert(
+            assertK(
                 0 < KARATSUBA_THRESHOLD
                         && KARATSUBA_THRESHOLD < TOOM_COOK_THRESHOLD
                         && TOOM_COOK_THRESHOLD < Int.MAX_VALUE
@@ -3848,10 +3848,10 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
          * with just the very first value.  Additional values will be created
          * on demand.
          */
-            powerCache = arrayOfNulls(Character.MAX_RADIX + 1)
-            logCache = DoubleArray(Character.MAX_RADIX + 1)
+            powerCache = arrayOfNulls(CHAR_MAX_RADIX + 1)
+            logCache = DoubleArray(CHAR_MAX_RADIX + 1)
 
-            for (i in Character.MIN_RADIX..Character.MAX_RADIX) {
+            for (i in CHAR_MIN_RADIX..CHAR_MAX_RADIX) {
                 powerCache[i] = arrayOf(BigInteger.valueOf(i.toLong()))
                 logCache[i] = kotlin.math.ln(i.toDouble())
             }
@@ -4095,7 +4095,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
 
         private fun multiplyByInt(x: IntArray, y: Int, sign: Int): BigInteger {
             if (Integer.bitCount(y) == 1) {
-                return BigInteger(shiftLeft(x, Integer.numberOfTrailingZeros(y)), sign)
+                return BigInteger(shiftLeft(x, y.countTrailingZeroBits()), sign)
             }
             val xlen = x.size
             var rmag = IntArray(xlen + 1)
@@ -4810,7 +4810,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             u: BigInteger, sb: StringBuilder,
             radix: Int, digits: Int
         ) {
-            assert(u.signum() >= 0)
+            assertK(u.signum() >= 0)
 
             // If we're smaller than a certain threshold, use the smallToString
             // method, padding with leading zeroes when necessary unless we're
