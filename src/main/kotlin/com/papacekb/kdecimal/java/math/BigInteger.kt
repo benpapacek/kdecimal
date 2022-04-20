@@ -4084,9 +4084,8 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             // Subtract remainder of longer number while borrow propagates
             var borrow = difference shr 32 != 0L
             while (bigIndex > 0 && borrow) {
-                val z =  big[bigIndex] - 1
-                result[--bigIndex] = z
-                borrow = z == -1
+                result[--bigIndex] = big[bigIndex] - 1
+                borrow = big[bigIndex] == -1
             }
 
             // Copy remainder of longer number

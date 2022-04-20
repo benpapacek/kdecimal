@@ -3,6 +3,7 @@ import com.papacekb.kdecimal.java.math.BigInteger
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import kotlin.math.exp
 
 class BigIntegerTest {
 
@@ -99,6 +100,14 @@ class BigIntegerTest {
     @Test
     fun testDoubleValue() {
         assertEquals(314159.0, BigInteger("314159").doubleValue())
+    }
+
+    @Test
+    fun testAddBigNegative() {
+        val a = BigInteger("-15108375323568332308738190204")
+        val b = BigInteger("398402929135419510431647221483")
+        val expected = BigInteger("383294553811851178122909031279")
+        assertEquals(expected, a.add(b))
     }
 
 }

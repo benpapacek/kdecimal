@@ -18,6 +18,12 @@ class BigDecimalTest {
             BigInteger.valueOf(5)!!.pow(50).toString())
     }
 
+    @Test fun testSubtractionNegative() {
+        val javaResult = java.math.BigDecimal("-0.15108375323568332308738190204").add(java.math.BigDecimal("3.98402929135419510431647221483"))
+        val customResult = BigDecimal("-0.15108375323568332308738190204").add(BigDecimal("3.98402929135419510431647221483"))
+        assertEquals(javaResult.toString(), customResult.toString())
+    }
+
     @Test
     fun testIntConstructor() {
         assertEquals(java.math.BigDecimal(31415).toString(), BigDecimal(31415).toString())
