@@ -1042,7 +1042,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             rmag[0] = carry.toInt()
         }
         if (carry == 0L)
-            rmag = java.util.Arrays.copyOfRange(rmag, 1, rmag.size)
+            rmag = rmag.copyOfRange(1, rmag.size)
         return BigInteger(rmag, rsign)
     }
 
@@ -4108,7 +4108,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
                 carry = product.ushr(32)
             }
             if (carry == 0L) {
-                rmag = java.util.Arrays.copyOfRange(rmag, 1, rmag.size)
+                rmag = rmag.copyOfRange(1, rmag.size)
             } else {
                 rmag[rstart] = carry.toInt()
             }
@@ -4885,7 +4885,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             while (keep < vlen && `val`[keep] == 0) {
                 keep++
             }
-            return java.util.Arrays.copyOfRange(`val`, keep, vlen)
+            return `val`.copyOfRange(keep, vlen)
         }
 
         /**
@@ -4901,7 +4901,7 @@ class BigInteger : com.papacekb.kdecimal.java.lang.Number, Comparable<BigInteger
             while (keep < vlen && `val`[keep] == 0) {
                 keep++
             }
-            return if (keep == 0) `val` else java.util.Arrays.copyOfRange(`val`, keep, vlen)
+            return if (keep == 0) `val` else `val`.copyOfRange(keep, vlen)
         }
 
         /**
